@@ -1,0 +1,55 @@
+{% if contacts %}
+<div class="table-responsive">
+  <table class="table table-hover align-middle mb-0">
+    <thead class="table-light">
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Email</th>
+        <th>Phone</th>
+        <th>Status</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for contact in contacts %}
+      <tr>
+        <td>
+          <a href="{% url 'contacts:detail' contact.pk %}" class="fw-semibold text-decoration-none">
+            {{ contact.name }}
+          </a>
+        </td>
+        <td>
+          {% if contact.contact_type == 'CUSTOMER' %}
+            <span class="badge bg-primary">Customer</span>
+          {% elif contact.contact_type == 'VENDOR' %}
+            <span class="badge bg-warning text-dark">Vendor</span>
+          {% else %}
+            <span class="badge bg-info text-dark">Both</span>
+          {% endif %}
+        </td>
+        <td class="text-muted small">{{ contact.email|default:"—" }}</td>
+        <td class="text-muted small">{{ contact.phone|default:"—" }}</td>
+        <td>
+          {% if contact.is_active %}
+            <span class="badge bg-success-subtle text-success">Active</span>
+          {% else %}
+            <span class="badge bg-secondary">Inactive</span>
+          {% endif %}
+        </td>
+        <td class="text-end">
+          <a href="{% url 'contacts:edit' contact.pk %}" class="btn btn-sm btn-outline-secondary">
+            <i class="bi bi-pencil"></i>
+          </a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="text-center text-muted py-5">
+  <i class="bi bi-people" style="font-size:2.5rem;"></i>
+  <p class="mt-2">No contacts found.</p>
+</div>
+{% endif %}

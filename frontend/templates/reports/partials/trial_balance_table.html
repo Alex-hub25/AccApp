@@ -1,0 +1,55 @@
+{% if rows %}
+<div class="card form-card">
+  {% if not balanced %}
+  <div class="alert alert-danger m-3"><i class="bi bi-exclamation-triangle me-2"></i>Warning: Trial balance is not balanced! Debits ≠ Credits.</div>
+  {% endif %}
+  <div class="table-responsive">
+    <table class="table table-hover table-sm align-middle mb-0">
+      <thead class="table-dark">
+        <tr>
+          <th style="width:100px;">Code</th>
+          <th>Account Name</th>
+          <th>Type</th>
+          <th class="text-end">Debit</th>
+          <th class="text-end">Credit</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in rows %}
+        <tr>
+          <td class="font-monospace small">{{ row.account.code }}</td>
+          <td>{{ row.account.name }}</td>
+          <td>
+            {% if row.account.account_type == 'ASSET' %}<span class="badge bg-primary">Asset</span>
+            {% elif row.account.account_type == 'LIABILITY' %}<span class="badge bg-danger">Liability</span>
+            {% elif row.account.account_type == 'EQUITY' %}<span class="badge bg-success">Equity</span>
+            {% elif row.account.account_type == 'INCOME' %}<span class="badge bg-info text-dark">Income</span>
+            {% else %}<span class="badge bg-warning text-dark">Expense</span>{% endif %}
+          </td>
+          <td class="text-amount">{% if row.debit %}{{ row.debit|floatformat:2 }}{% endif %}</td>
+          <td class="text-amount">{% if row.credit %}{{ row.credit|floatformat:2 }}{% endif %}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+      <tfoot class="table-dark fw-bold">
+        <tr>
+          <td colspan="3" class="text-end">Total</td>
+          <td class="text-amount">{{ total_debit|floatformat:2 }}</td>
+          <td class="text-amount">{{ total_credit|floatformat:2 }}</td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+  <div class="card-footer text-muted small">
+    Period: {% if date_from %}{{ date_from }} to {% endif %}{{ date_to }}
+    &mdash;
+    {% if balanced %}<span class="text-success"><i class="bi bi-check-circle me-1"></i>Balanced</span>
+    {% else %}<span class="text-danger"><i class="bi bi-x-circle me-1"></i>Not balanced</span>{% endif %}
+  </div>
+</div>
+{% else %}
+<div class="card form-card text-center text-muted py-5">
+  <i class="bi bi-table" style="font-size:2.5rem;"></i>
+  <p class="mt-2">No account activity for this period.</p>
+</div>
+{% endif %}

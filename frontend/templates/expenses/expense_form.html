@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% block title %}{% if object %}Edit Expense{% else %}New Expense{% endif %}{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1>{% if object %}<i class="bi bi-pencil me-2"></i>Edit Expense{% else %}<i class="bi bi-wallet2 me-2"></i>New Expense{% endif %}</h1>
+  <a href="{% url 'expenses:list' %}" class="btn btn-outline-secondary">
+    <i class="bi bi-arrow-left me-1"></i>Back
+  </a>
+</div>
+<div class="form-card" style="max-width:700px;">
+  {% crispy form %}
+</div>
+{% endblock %}

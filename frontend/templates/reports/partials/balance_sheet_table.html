@@ -1,0 +1,75 @@
+{% if asset_rows or liability_rows or equity_rows %}
+<div class="row g-3">
+  <!-- Left: Assets -->
+  <div class="col-md-6">
+    <div class="card form-card">
+      <div class="card-header bg-primary text-white fw-semibold">Assets</div>
+      <div class="table-responsive">
+        <table class="table table-sm mb-0">
+          <tbody>
+            {% for row in asset_rows %}
+            <tr>
+              <td>{{ row.account.name }}</td>
+              <td class="text-amount text-primary fw-semibold">{{ row.amount|floatformat:2 }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+          <tfoot class="table-primary fw-bold">
+            <tr><td>Total Assets</td><td class="text-amount">{{ total_assets|floatformat:2 }}</td></tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right: Liabilities + Equity -->
+  <div class="col-md-6">
+    <div class="card form-card mb-3">
+      <div class="card-header bg-danger text-white fw-semibold">Liabilities</div>
+      <div class="table-responsive">
+        <table class="table table-sm mb-0">
+          <tbody>
+            {% for row in liability_rows %}
+            <tr>
+              <td>{{ row.account.name }}</td>
+              <td class="text-amount text-danger">{{ row.amount|floatformat:2 }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+          <tfoot class="table-danger fw-bold">
+            <tr><td>Total Liabilities</td><td class="text-amount">{{ total_liabilities|floatformat:2 }}</td></tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+    <div class="card form-card">
+      <div class="card-header bg-success text-white fw-semibold">Equity</div>
+      <div class="table-responsive">
+        <table class="table table-sm mb-0">
+          <tbody>
+            {% for row in equity_rows %}
+            <tr>
+              <td>{{ row.account.name }}</td>
+              <td class="text-amount text-success">{{ row.amount|floatformat:2 }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+          <tfoot class="table-success fw-bold">
+            <tr><td>Total Equity</td><td class="text-amount">{{ total_equity|floatformat:2 }}</td></tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+    <div class="mt-2 text-end small {% if balanced %}text-success{% else %}text-danger fw-bold{% endif %}">
+      {% if balanced %}<i class="bi bi-check-circle me-1"></i>Balanced
+      {% else %}<i class="bi bi-x-circle me-1"></i>Imbalanced: Assets={{ total_assets|floatformat:2 }}, Liab+Eq={{ total_liabilities|add:total_equity|floatformat:2 }}{% endif %}
+    </div>
+  </div>
+</div>
+<div class="text-muted small mt-2">As of: {{ date_to }}</div>
+{% else %}
+<div class="card form-card text-center text-muted py-5">
+  <i class="bi bi-bar-chart-steps" style="font-size:2.5rem;"></i>
+  <p class="mt-2">No data for this period.</p>
+</div>
+{% endif %}

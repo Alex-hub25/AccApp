@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% block title %}{{ title }}{% endblock %}
+
+{% block extra_js %}
+<script>
+  function addItemRow() {
+    const container = document.getElementById('item-formset-container');
+    const totalForms = document.getElementById('id_items-TOTAL_FORMS');
+    const formNum = parseInt(totalForms.value);
+    const template = document.getElementById('empty-item-template').innerHTML
+      .replace(/__prefix__/g, formNum);
+    container.insertAdjacentHTML('beforeend', template);
+    totalForms.value = formNum + 1;
+    recalc();
+  }
+
+  function recalc() {
+    let subtotal = 0;
+    document.querySelectorAll('.item-row').forEach(row => {
+      const qty = parseFloat(row.querySelector('[name$="-quantity"]')?.value) || 0;
+      const price = parseFloat(row.querySelector('[name$="-unit_price"]')?.value) || 0;
+      subtotal += qty * price;
+    });
+    const el = document.getElementById('subtotal-display');
+    if (el) el.textContent = subtotal.toFixed(2);
+  }
+
+  document.addEventListener('input', recalc);
+  document.addEventListener('DOMContentLoaded', recalc);
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1><i class="bi bi-receipt me-2"></i>{{ title }}</h1>
+  <a href="{% url 'invoicing:invoice_list' %}" class="btn btn-outline-secondary">
+    <i class="bi bi-arrow-left me-1"></i>Back
+  </a>
+</div>
+
+<form method="post">
+  {% csrf_token %}
+  {{ formset.management_form }}
+
+  <div class="form-card mb-3" style="max-width:800px;">
+    <h6 class="fw-semibold mb-3 text-muted text-uppercase small">Invoice Details</h6>
+    <div class="row g-3">
+      <div class="col-md-6">{% crispy form %}</div>
+    </div>
+  </div>
+
+  <div class="form-card" style="max-width:900px;">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h6 class="fw-semibold mb-0 text-muted text-uppercase small">Line Items</h6>
+      <button type="button" class="btn btn-sm btn-outline-primary" onclick="addItemRow()">
+        <i class="bi bi-plus-lg me-1"></i>Add Line
+      </button>
+    </div>
+    <div class="table-responsive">
+      <table class="table table-sm align-middle">
+        <thead class="table-light">
+          <tr>
+            <th>Description</th>
+            <th style="width:90px;">Qty</th>
+            <th style="width:130px;">Unit Price</th>
+            <th style="width:180px;">Account</th>
+            <th style="width:40px;"></th>
+          </tr>
+        </thead>
+        <tbody id="item-formset-container">
+          {% for item_form in formset %}
+          <tr class="item-row">
+            <td>{{ item_form.id }}{{ item_form.description }}</td>
+            <td>{{ item_form.quantity }}</td>
+            <td>{{ item_form.unit_price }}</td>
+            <td>{{ item_form.account }}</td>
+            <td>{% if item_form.instance.pk %}<div class="form-check">{{ item_form.DELETE }}</div>{% endif %}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div class="text-end me-4 text-muted small">
+      Subtotal: <strong class="text-dark ms-1">{{ active_company.currency }} <span id="subtotal-display">—</span></strong>
+    </div>
+  </div>
+
+  <div class="mt-3" style="max-width:900px;">
+    <button type="submit" class="btn btn-primary">
+      <i class="bi bi-floppy me-1"></i>Save Invoice
+    </button>
+  </div>
+</form>
+
+<template id="empty-item-template">
+  {% with formset.empty_form as item_form %}
+  <tr class="item-row">
+    <td>{{ item_form.id }}{{ item_form.description }}</td>
+    <td>{{ item_form.quantity }}</td>
+    <td>{{ item_form.unit_price }}</td>
+    <td>{{ item_form.account }}</td>
+    <td></td>
+  </tr>
+  {% endwith %}
+</template>
+{% endblock %}

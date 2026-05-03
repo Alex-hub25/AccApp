@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% block title %}Register{% endblock %}
+{% block auth_content %}
+<div class="card shadow-sm">
+  <div class="card-body p-4">
+    <h4 class="fw-bold mb-4">Create Account</h4>
+    {% crispy form %}
+  </div>
+  <div class="card-footer text-center text-muted small">
+    Already have an account? <a href="{% url 'accounts:login' %}">Sign in</a>
+  </div>
+</div>
+{% endblock %}

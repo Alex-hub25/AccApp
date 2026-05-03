@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Payments{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1><i class="bi bi-credit-card me-2"></i>Payments</h1>
+  <a href="{% url 'invoicing:payment_create' %}" class="btn btn-primary">
+    <i class="bi bi-plus-lg me-1"></i>Record Payment
+  </a>
+</div>
+<div class="card form-card">
+  {% if payments %}
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead class="table-light">
+        <tr><th>Date</th><th>Type</th><th>Contact</th><th>Reference</th><th class="text-end">Amount</th><th>Linked to</th></tr>
+      </thead>
+      <tbody>
+        {% for pmt in payments %}
+        <tr>
+          <td class="text-muted small">{{ pmt.date }}</td>
+          <td>
+            {% if pmt.payment_type == 'RECEIVED' %}
+            <span class="badge bg-success">Received</span>
+            {% else %}
+            <span class="badge bg-danger">Made</span>
+            {% endif %}
+          </td>
+          <td>{{ pmt.contact.name }}</td>
+          <td class="text-muted small">{{ pmt.reference|default:"—" }}</td>
+          <td class="text-amount fw-semibold">{{ active_company.currency }} {{ pmt.amount|floatformat:2 }}</td>
+          <td class="small">
+            {% if pmt.invoice %}<a href="{% url 'invoicing:invoice_detail' pmt.invoice.pk %}">INV {{ pmt.invoice.invoice_number }}</a>
+            {% elif pmt.bill %}<a href="{% url 'invoicing:bill_detail' pmt.bill.pk %}">BILL-{{ pmt.bill.pk }}</a>
+            {% else %}—{% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="card-body text-center text-muted py-5">
+    <i class="bi bi-credit-card" style="font-size:2.5rem;"></i>
+    <p class="mt-2">No payments recorded yet.</p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

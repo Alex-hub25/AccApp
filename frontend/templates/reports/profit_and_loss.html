@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Profit & Loss{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1><i class="bi bi-graph-up me-2"></i>Profit & Loss</h1>
+</div>
+
+<div class="card form-card mb-3">
+  <div class="card-body py-2">
+    <form class="row g-2 align-items-end"
+          hx-get="{% url 'reports:profit_and_loss' %}"
+          hx-target="#report-content"
+          hx-trigger="submit"
+          hx-push-url="true">
+      {% csrf_token %}
+      <div class="col-auto">
+        <label class="form-label small text-muted mb-1">From</label>
+        <input type="date" name="date_from" class="form-control form-control-sm" value="{{ date_from }}">
+      </div>
+      <div class="col-auto">
+        <label class="form-label small text-muted mb-1">To</label>
+        <input type="date" name="date_to" class="form-control form-control-sm" value="{{ date_to }}" required>
+      </div>
+      <div class="col-auto">
+        <button type="submit" class="btn btn-primary btn-sm">
+          <i class="bi bi-funnel me-1"></i>Run
+          <span class="htmx-indicator spinner-border spinner-border-sm ms-1" role="status"></span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div id="report-content">
+  {% include "reports/partials/pl_table.html" %}
+</div>
+{% endblock %}

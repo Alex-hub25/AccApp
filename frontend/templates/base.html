@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}TradApp{% endblock %} | TradApp</title>
+
+  <!-- Bootstrap 5 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="/static/css/app.css">
+
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+{% if user.is_authenticated %}
+<!-- ── Top Navbar ──────────────────────────────────────────────────────────── -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
+  <div class="container-fluid">
+    <a class="navbar-brand fw-bold" href="{% url 'dashboard:index' %}">
+      <i class="bi bi-calculator-fill me-2"></i>TradApp
+    </a>
+
+    <!-- Company Switcher -->
+    <div class="d-flex align-items-center me-auto ms-3">
+      {% if active_company %}
+      <div class="dropdown">
+        <button class="btn btn-outline-light btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+          <i class="bi bi-building me-1"></i>{{ active_company.name }}
+        </button>
+        <ul class="dropdown-menu">
+          {% for co in user_companies %}
+          <li>
+            <a class="dropdown-item {% if co == active_company %}active{% endif %}"
+               href="{% url 'accounts:company_switch' co.pk %}">
+              {{ co.name }}
+            </a>
+          </li>
+          {% endfor %}
+          <li><hr class="dropdown-divider"></li>
+          <li><a class="dropdown-item" href="{% url 'accounts:company_create' %}">
+            <i class="bi bi-plus-circle me-1"></i>New Company</a>
+          </li>
+        </ul>
+      </div>
+      {% endif %}
+    </div>
+
+    <div class="d-flex align-items-center gap-2">
+      <span class="text-white-50 small d-none d-md-block">{{ user.get_full_name|default:user.username }}</span>
+      <a class="btn btn-outline-light btn-sm" href="{% url 'accounts:logout' %}">
+        <i class="bi bi-box-arrow-right"></i>
+      </a>
+    </div>
+  </div>
+</nav>
+
+<!-- ── Sidebar + Content ───────────────────────────────────────────────────── -->
+<div class="d-flex" style="margin-top:56px; min-height:calc(100vh - 56px);">
+
+  <!-- Sidebar -->
+  <nav id="sidebar" class="bg-dark text-white d-flex flex-column p-0" style="width:230px;min-width:230px;">
+    <ul class="nav flex-column pt-2">
+      <li class="nav-item">
+        <a class="nav-link text-white {% if request.resolver_match.app_name == 'dashboard' %}active bg-primary rounded mx-1{% endif %}"
+           href="{% url 'dashboard:index' %}">
+          <i class="bi bi-speedometer2 me-2"></i>Dashboard
+        </a>
+      </li>
+
+      <li class="nav-item mt-2">
+        <span class="nav-link text-uppercase text-secondary small px-3 py-1">Transactions</span>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link text-white {% if request.resolver_match.app_name == 'invoicing' and 'invoice' in request.resolver_match.url_name %}active bg-primary rounded mx-1{% endif %}"
+           href="{% url 'invoicing:invoice_list' %}">
+          <i class="bi bi-receipt me-2"></i>Invoices
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link text-white {% if request.resolver_match.app_name == 'invoicing' and 'bill' in request.resolver_match.url_name %}active bg-primary rounded mx-1{% endif %}"
+           href="{% url 'invoicing:bill_list' %}">
+          <i class="bi bi-file-earmark-text me-2"></i>Bills
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link text-white {% if request.resolver_match.app_name == 'invoicing' and 'payment' in request.resolver_match.url_name %}active bg-primary rounded mx-1{% endif %}"
+           href="{% url 'invoicing:payment_list' %}">
+          <i class="bi bi-credit-card me-2"></i>Payments
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link text-white {% if request.resolver_match.app_name == 'expenses' %}active bg-primary rounded mx-1{% endif %}"
+           href="{% url 'expenses:list' %}">
+          <i class="bi bi-wallet2 me-2"></i>Expenses
+        </a>
+      </li>
+
+      <li class="nav-item mt-2">
+        <span class="nav-link text-uppercase text-secondary small px-3 py-1">Accounting</span>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link text-white {% if request.resolver_match.app_name == 'ledger' and 'account' in request.resolver_match.url_name %}active bg-primary rounded mx-1{% endif %}"
+           href="{% url 'ledger:account_list' %}">
+          <i class="bi bi-journal-bookmark me-2"></i>Chart of Accounts
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link text-white {% if request.resolver_match.app_name == 'ledger' and 'entry' in request.resolver_match.url_name %}active bg-primary rounded mx-1{% endif %}"
+           href="{% url 'ledger:entry_list' %}">
+          <i class="bi bi-journal-plus me-2"></i>Journal Entries
+        </a>
+      </li>
+
+      <li class="nav-item mt-2">
+        <span class="nav-link text-uppercase text-secondary small px-3 py-1">Reports</span>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link text-white {% if request.resolver_match.app_name == 'reports' and 'trial' in request.resolver_match.url_name %}active bg-primary rounded mx-1{% endif %}"
+           href="{% url 'reports:trial_balance' %}">
+          <i class="bi bi-table me-2"></i>Trial Balance
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link text-white {% if request.resolver_match.app_name == 'reports' and 'profit' in request.resolver_match.url_name %}active bg-primary rounded mx-1{% endif %}"
+           href="{% url 'reports:profit_and_loss' %}">
+          <i class="bi bi-graph-up-arrow me-2"></i>Profit & Loss
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link text-white {% if request.resolver_match.app_name == 'reports' and 'balance' in request.resolver_match.url_name %}active bg-primary rounded mx-1{% endif %}"
+           href="{% url 'reports:balance_sheet' %}">
+          <i class="bi bi-bar-chart-line me-2"></i>Balance Sheet
+        </a>
+      </li>
+
+      <li class="nav-item mt-2">
+        <span class="nav-link text-uppercase text-secondary small px-3 py-1">Settings</span>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link text-white {% if request.resolver_match.app_name == 'contacts' %}active bg-primary rounded mx-1{% endif %}"
+           href="{% url 'contacts:list' %}">
+          <i class="bi bi-people me-2"></i>Contacts
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link text-white {% if request.resolver_match.app_name == 'taxes' %}active bg-primary rounded mx-1{% endif %}"
+           href="{% url 'taxes:list' %}">
+          <i class="bi bi-percent me-2"></i>Tax Rates
+        </a>
+      </li>
+      <li class="nav-item mb-3">
+        <a class="nav-link text-white {% if request.resolver_match.app_name == 'accounts' and 'company' in request.resolver_match.url_name %}active bg-primary rounded mx-1{% endif %}"
+           href="{% url 'accounts:company_list' %}">
+          <i class="bi bi-gear me-2"></i>Companies
+        </a>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- Main content -->
+  <main class="flex-grow-1 p-4 bg-light">
+
+    <!-- Flash messages -->
+    {% if messages %}
+    <div class="mb-3">
+      {% for message in messages %}
+      <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    {% block content %}{% endblock %}
+  </main>
+</div>
+
+{% else %}
+<!-- Unauthenticated layout -->
+<div class="container-fluid min-vh-100 d-flex align-items-center justify-content-center bg-light">
+  <div class="col-md-5 col-lg-4">
+    <div class="text-center mb-4">
+      <i class="bi bi-calculator-fill text-primary" style="font-size:3rem;"></i>
+      <h2 class="fw-bold text-primary mt-2">TradApp</h2>
+      <p class="text-muted">Small Business Accounting</p>
+    </div>
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show">
+      {{ message }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% endfor %}
+    {% endif %}
+    {% block auth_content %}{% endblock %}
+  </div>
+</div>
+{% endif %}
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<!-- HTMX -->
+<script src="https://unpkg.com/htmx.org@2.0.4/dist/htmx.min.js"></script>
+<!-- Alpine.js -->
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+<!-- Custom JS -->
+<script src="/static/js/app.js"></script>
+
+{% block extra_js %}{% endblock %}
+</body>
+</html>

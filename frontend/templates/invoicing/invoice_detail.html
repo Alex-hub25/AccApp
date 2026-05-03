@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% block title %}Invoice {{ object.invoice_number }}{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1>
+    <i class="bi bi-receipt me-2"></i>{{ object.invoice_number }}
+    <span class="badge badge-{{ object.status }} ms-2">{{ object.get_status_display }}</span>
+  </h1>
+  <div class="d-flex gap-2">
+    <a href="{% url 'invoicing:invoice_edit' object.pk %}" class="btn btn-outline-secondary">
+      <i class="bi bi-pencil me-1"></i>Edit
+    </a>
+    {% if object.amount_due > 0 and object.status != 'VOID' %}
+    <a href="{% url 'invoicing:payment_for_invoice' object.pk %}" class="btn btn-success">
+      <i class="bi bi-cash me-1"></i>Record Payment
+    </a>
+    {% endif %}
+  </div>
+</div>
+
+<div class="row g-3">
+  <!-- Invoice info -->
+  <div class="col-md-5">
+    <div class="card form-card h-100">
+      <div class="card-body">
+        <h6 class="fw-semibold mb-3 text-muted text-uppercase small">Details</h6>
+        <dl class="row mb-0">
+          <dt class="col-sm-4 text-muted">Contact</dt>
+          <dd class="col-sm-8"><a href="{% url 'contacts:detail' object.contact.pk %}">{{ object.contact.name }}</a></dd>
+          <dt class="col-sm-4 text-muted">Date</dt>
+          <dd class="col-sm-8">{{ object.date }}</dd>
+          <dt class="col-sm-4 text-muted">Due Date</dt>
+          <dd class="col-sm-8 {% if object.status == 'OVERDUE' %}text-danger fw-semibold{% endif %}">{{ object.due_date }}</dd>
+          {% if object.notes %}
+          <dt class="col-sm-4 text-muted">Notes</dt>
+          <dd class="col-sm-8">{{ object.notes }}</dd>
+          {% endif %}
+        </dl>
+      </div>
+    </div>
+  </div>
+
+  <!-- Totals -->
+  <div class="col-md-7">
+    <div class="card form-card h-100">
+      <div class="card-body">
+        <h6 class="fw-semibold mb-3 text-muted text-uppercase small">Line Items</h6>
+        <div class="table-responsive">
+          <table class="table table-sm mb-0">
+            <thead class="table-light">
+              <tr><th>Description</th><th class="text-end">Qty</th><th class="text-end">Unit Price</th><th class="text-end">Total</th></tr>
+            </thead>
+            <tbody>
+              {% for item in object.items.all %}
+              <tr>
+                <td>{{ item.description }}</td>
+                <td class="text-amount">{{ item.quantity|floatformat:2 }}</td>
+                <td class="text-amount">{{ item.unit_price|floatformat:2 }}</td>
+                <td class="text-amount fw-semibold">{{ item.line_total|floatformat:2 }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+            <tfoot class="table-light">
+              <tr>
+                <td colspan="3" class="text-end text-muted">Subtotal</td>
+                <td class="text-amount">{{ object.subtotal|floatformat:2 }}</td>
+              </tr>
+              {% if object.tax_amount %}
+              <tr>
+                <td colspan="3" class="text-end text-muted">Tax ({{ object.tax_rate }})</td>
+                <td class="text-amount">{{ object.tax_amount|floatformat:2 }}</td>
+              </tr>
+              {% endif %}
+              <tr class="fw-bold">
+                <td colspan="3" class="text-end">Total</td>
+                <td class="text-amount fs-5">{{ active_company.currency }} {{ object.total|floatformat:2 }}</td>
+              </tr>
+              <tr class="text-success">
+                <td colspan="3" class="text-end">Amount Paid</td>
+                <td class="text-amount">({{ object.amount_paid|floatformat:2 }})</td>
+              </tr>
+              <tr class="fw-bold {% if object.amount_due > 0 %}text-danger{% else %}text-success{% endif %}">
+                <td colspan="3" class="text-end">Balance Due</td>
+                <td class="text-amount fs-5">{{ active_company.currency }} {{ object.amount_due|floatformat:2 }}</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Payments -->
+{% with payments=object.payments.all %}
+{% if payments %}
+<div class="card form-card mt-3">
+  <div class="card-body">
+    <h6 class="fw-semibold mb-3 text-muted text-uppercase small">Payments</h6>
+    <div class="table-responsive">
+      <table class="table table-sm mb-0">
+        <thead class="table-light">
+          <tr><th>Date</th><th>Reference</th><th class="text-end">Amount</th></tr>
+        </thead>
+        <tbody>
+          {% for pmt in payments %}
+          <tr>
+            <td class="text-muted small">{{ pmt.date }}</td>
+            <td class="small">{{ pmt.reference|default:"—" }}</td>
+            <td class="text-amount text-success">{{ pmt.amount|floatformat:2 }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endif %}
+{% endwith %}
+{% endblock %}

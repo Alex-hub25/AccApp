@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block title %}Bill {{ object.pk }}{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1>
+    <i class="bi bi-file-earmark-text me-2"></i>BILL-{{ object.pk }}
+    <span class="badge badge-{{ object.status }} ms-2">{{ object.get_status_display }}</span>
+  </h1>
+  <div class="d-flex gap-2">
+    {% if object.amount_due > 0 and object.status != 'VOID' %}
+    <a href="{% url 'invoicing:payment_for_bill' object.pk %}" class="btn btn-success">
+      <i class="bi bi-cash me-1"></i>Record Payment
+    </a>
+    {% endif %}
+  </div>
+</div>
+
+<div class="row g-3">
+  <div class="col-md-5">
+    <div class="card form-card">
+      <div class="card-body">
+        <dl class="row mb-0">
+          <dt class="col-sm-4 text-muted">Vendor</dt>
+          <dd class="col-sm-8">{{ object.contact.name }}</dd>
+          <dt class="col-sm-4 text-muted">Date</dt>
+          <dd class="col-sm-8">{{ object.date }}</dd>
+          <dt class="col-sm-4 text-muted">Due Date</dt>
+          <dd class="col-sm-8">{{ object.due_date }}</dd>
+        </dl>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-7">
+    <div class="card form-card">
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-sm mb-0">
+            <thead class="table-light">
+              <tr><th>Description</th><th class="text-end">Qty</th><th class="text-end">Unit Price</th><th class="text-end">Total</th></tr>
+            </thead>
+            <tbody>
+              {% for item in object.items.all %}
+              <tr>
+                <td>{{ item.description }}</td>
+                <td class="text-amount">{{ item.quantity }}</td>
+                <td class="text-amount">{{ item.unit_price|floatformat:2 }}</td>
+                <td class="text-amount">{{ item.line_total|floatformat:2 }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+            <tfoot class="table-light">
+              <tr class="fw-bold">
+                <td colspan="3" class="text-end">Total</td>
+                <td class="text-amount">{{ active_company.currency }} {{ object.total|floatformat:2 }}</td>
+              </tr>
+              <tr class="text-success">
+                <td colspan="3" class="text-end">Paid</td>
+                <td class="text-amount">({{ object.amount_paid|floatformat:2 }})</td>
+              </tr>
+              <tr class="fw-bold {% if object.amount_due > 0 %}text-danger{% else %}text-success{% endif %}">
+                <td colspan="3" class="text-end">Balance Due</td>
+                <td class="text-amount">{{ active_company.currency }} {{ object.amount_due|floatformat:2 }}</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

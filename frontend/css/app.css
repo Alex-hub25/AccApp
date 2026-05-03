@@ -1,0 +1,127 @@
+/* TradApp Custom Styles */
+
+/* ── Orange theme: override Bootstrap primary ────────────────────────────── */
+:root, [data-bs-theme=light] {
+  --bs-primary: #fd7e14;
+  --bs-primary-rgb: 253, 126, 20;
+  --bs-link-color: #fd7e14;
+  --bs-link-color-rgb: 253, 126, 20;
+  --bs-link-hover-color: #ca6510;
+  --bs-link-hover-color-rgb: 202, 101, 16;
+}
+
+.btn-primary {
+  --bs-btn-color: #fff;
+  --bs-btn-bg: #fd7e14;
+  --bs-btn-border-color: #fd7e14;
+  --bs-btn-hover-color: #fff;
+  --bs-btn-hover-bg: #ca6510;
+  --bs-btn-hover-border-color: #bd5f0f;
+  --bs-btn-active-bg: #be5f0e;
+  --bs-btn-active-border-color: #b2590d;
+  --bs-btn-disabled-bg: #fd7e14;
+  --bs-btn-disabled-border-color: #fd7e14;
+}
+
+.btn-outline-primary {
+  --bs-btn-color: #fd7e14;
+  --bs-btn-border-color: #fd7e14;
+  --bs-btn-hover-color: #fff;
+  --bs-btn-hover-bg: #fd7e14;
+  --bs-btn-hover-border-color: #fd7e14;
+  --bs-btn-active-color: #fff;
+  --bs-btn-active-bg: #fd7e14;
+}
+
+.bg-primary { background-color: #fd7e14 !important; }
+.text-primary { color: #fd7e14 !important; }
+.border-primary { border-color: #fd7e14 !important; }
+.navbar.bg-primary { background-color: #fd7e14 !important; }
+.nav-link.active.bg-primary, .active.bg-primary { background-color: #ca6510 !important; }
+
+/* Sidebar */
+#sidebar {
+  transition: width 0.2s ease;
+}
+
+#sidebar .nav-link {
+  font-size: 0.9rem;
+  padding: 0.45rem 1rem;
+  border-radius: 0.375rem;
+}
+
+#sidebar .nav-link:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Page headings */
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+.page-header h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+/* Summary cards */
+.card-summary {
+  border: none;
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,.08);
+}
+
+.card-summary .card-body {
+  padding: 1.25rem 1.5rem;
+}
+
+.card-summary .icon-box {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+}
+
+/* Status badges */
+.badge-DRAFT    { background-color: #6c757d; }
+.badge-SENT     { background-color: #0d6efd; }
+.badge-PARTIAL  { background-color: #fd7e14; }
+.badge-PAID     { background-color: #198754; }
+.badge-OVERDUE  { background-color: #dc3545; }
+.badge-VOID     { background-color: #adb5bd; }
+.badge-RECEIVED { background-color: #0dcaf0; }
+
+/* Tables */
+.table-hover tbody tr:hover {
+  background-color: rgba(253, 126, 20, 0.05);
+}
+
+/* Forms */
+.form-card {
+  background: #fff;
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,.08);
+  padding: 1.75rem;
+}
+
+/* HTMX loading indicator */
+.htmx-indicator {
+  display: none;
+}
+.htmx-request .htmx-indicator {
+  display: inline-block;
+}
+
+/* Amount cell alignment */
+.text-amount {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  font-family: monospace;
+}

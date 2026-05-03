@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Expense Detail{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1><i class="bi bi-wallet2 me-2"></i>{{ object.description }}</h1>
+  <div class="d-flex gap-2">
+    <a href="{% url 'expenses:edit' object.pk %}" class="btn btn-outline-secondary">
+      <i class="bi bi-pencil me-1"></i>Edit
+    </a>
+    <a href="{% url 'expenses:delete' object.pk %}" class="btn btn-outline-danger">
+      <i class="bi bi-trash me-1"></i>Delete
+    </a>
+  </div>
+</div>
+<div class="card form-card" style="max-width:600px;">
+  <div class="card-body">
+    <dl class="row mb-0">
+      <dt class="col-sm-4 text-muted">Date</dt><dd class="col-sm-8">{{ object.date }}</dd>
+      <dt class="col-sm-4 text-muted">Amount</dt>
+      <dd class="col-sm-8 fw-bold text-danger">{{ active_company.currency }} {{ object.amount|floatformat:2 }}</dd>
+      {% if object.tax_amount %}
+      <dt class="col-sm-4 text-muted">Tax</dt>
+      <dd class="col-sm-8">{{ object.tax_rate }} — {{ active_company.currency }} {{ object.tax_amount|floatformat:2 }}</dd>
+      <dt class="col-sm-4 text-muted">Total</dt>
+      <dd class="col-sm-8 fw-bold">{{ active_company.currency }} {{ object.total_with_tax|floatformat:2 }}</dd>
+      {% endif %}
+      <dt class="col-sm-4 text-muted">Account</dt><dd class="col-sm-8">{{ object.account }}</dd>
+      <dt class="col-sm-4 text-muted">Vendor</dt><dd class="col-sm-8">{{ object.contact|default:"—" }}</dd>
+      {% if object.notes %}
+      <dt class="col-sm-4 text-muted">Notes</dt><dd class="col-sm-8">{{ object.notes }}</dd>
+      {% endif %}
+      {% if object.receipt %}
+      <dt class="col-sm-4 text-muted">Receipt</dt>
+      <dd class="col-sm-8"><a href="{{ object.receipt.url }}" target="_blank"><i class="bi bi-paperclip me-1"></i>View</a></dd>
+      {% endif %}
+    </dl>
+  </div>
+</div>
+{% endblock %}

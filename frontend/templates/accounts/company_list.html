@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% block title %}Companies{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1><i class="bi bi-building me-2"></i>Companies</h1>
+  <a href="{% url 'accounts:company_create' %}" class="btn btn-primary">
+    <i class="bi bi-plus-lg me-1"></i>New Company
+  </a>
+</div>
+
+{% if not companies %}
+<div class="card form-card text-center py-5">
+  <i class="bi bi-building text-muted" style="font-size:3rem;"></i>
+  <h5 class="mt-3">No companies yet</h5>
+  <p class="text-muted">Create your first company to get started.</p>
+  <a href="{% url 'accounts:company_create' %}" class="btn btn-primary mx-auto" style="width:200px;">
+    <i class="bi bi-plus-lg me-1"></i>Create Company
+  </a>
+</div>
+{% else %}
+<div class="row g-3">
+  {% for company in companies %}
+  <div class="col-md-6 col-lg-4">
+    <div class="card form-card h-100">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-start">
+          <div>
+            <h5 class="fw-bold mb-1">{{ company.name }}</h5>
+            <span class="badge bg-secondary">{{ company.currency }}</span>
+            {% if active_company.pk == company.pk %}
+            <span class="badge bg-success ms-1">Active</span>
+            {% endif %}
+          </div>
+          <a href="{% url 'accounts:company_edit' company.pk %}" class="btn btn-sm btn-outline-secondary">
+            <i class="bi bi-pencil"></i>
+          </a>
+        </div>
+        {% if company.email %}<p class="text-muted small mb-1 mt-2"><i class="bi bi-envelope me-1"></i>{{ company.email }}</p>{% endif %}
+        {% if company.phone %}<p class="text-muted small mb-1"><i class="bi bi-telephone me-1"></i>{{ company.phone }}</p>{% endif %}
+      </div>
+      <div class="card-footer bg-transparent">
+        {% if active_company.pk != company.pk %}
+        <a href="{% url 'accounts:company_switch' company.pk %}" class="btn btn-sm btn-outline-primary w-100">
+          Switch to this company
+        </a>
+        {% else %}
+        <span class="text-success small"><i class="bi bi-check-circle me-1"></i>Currently active</span>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+{% endblock %}

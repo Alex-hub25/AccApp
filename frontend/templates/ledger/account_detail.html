@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block title %}{{ object.code }} – {{ object.name }}{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1>
+    <span class="font-monospace text-muted me-2">{{ object.code }}</span>{{ object.name }}
+    {% if object.account_type == 'ASSET' %}<span class="badge bg-primary ms-2">Asset</span>
+    {% elif object.account_type == 'LIABILITY' %}<span class="badge bg-danger ms-2">Liability</span>
+    {% elif object.account_type == 'EQUITY' %}<span class="badge bg-success ms-2">Equity</span>
+    {% elif object.account_type == 'INCOME' %}<span class="badge bg-info text-dark ms-2">Income</span>
+    {% else %}<span class="badge bg-warning text-dark ms-2">Expense</span>{% endif %}
+  </h1>
+  <a href="{% url 'ledger:account_edit' object.pk %}" class="btn btn-outline-secondary">
+    <i class="bi bi-pencil me-1"></i>Edit
+  </a>
+</div>
+
+<div class="row g-3 mb-3">
+  <div class="col-md-4">
+    <div class="card form-card text-center">
+      <div class="card-body">
+        <div class="text-muted small mb-1">Current Balance</div>
+        <div class="fw-bold fs-3 {% if object.balance >= 0 %}text-success{% else %}text-danger{% endif %}">
+          {{ active_company.currency }} {{ object.balance|floatformat:2 }}
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-8">
+    <div class="card form-card h-100">
+      <div class="card-body">
+        <dl class="row mb-0">
+          <dt class="col-sm-4 text-muted">Parent Account</dt>
+          <dd class="col-sm-8">{{ object.parent|default:"—" }}</dd>
+          <dt class="col-sm-4 text-muted">Description</dt>
+          <dd class="col-sm-8">{{ object.description|default:"—" }}</dd>
+        </dl>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Ledger entries -->
+<div class="card form-card">
+  <div class="card-body">
+    <h6 class="fw-semibold mb-3 text-uppercase small text-muted">Ledger Entries</h6>
+    {% if lines %}
+    <div class="table-responsive">
+      <table class="table table-sm table-hover mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>Date</th>
+            <th>Reference</th>
+            <th>Description</th>
+            <th class="text-end">Debit</th>
+            <th class="text-end">Credit</th>
+            <th class="text-end">Balance</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% with running=0 %}
+          {% for line in lines %}
+          <tr>
+            <td class="text-muted small">{{ line.entry.date }}</td>
+            <td class="small font-monospace">{{ line.entry.reference|default:"—" }}</td>
+            <td class="small">{{ line.description|default:line.entry.description }}</td>
+            <td class="text-amount">{% if line.debit %}{{ line.debit|floatformat:2 }}{% endif %}</td>
+            <td class="text-amount">{% if line.credit %}{{ line.credit|floatformat:2 }}{% endif %}</td>
+            <td class="text-amount fw-semibold">—</td>
+          </tr>
+          {% endfor %}
+          {% endwith %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <p class="text-muted small mb-0">No posted entries for this account.</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

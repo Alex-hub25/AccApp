@@ -1,0 +1,63 @@
+{% if income_rows or expense_rows %}
+<div class="card form-card">
+  <div class="table-responsive">
+    <table class="table table-sm mb-0">
+      <!-- Income -->
+      <thead class="table-success">
+        <tr><th colspan="2">Income</th></tr>
+      </thead>
+      <thead class="table-light">
+        <tr><th>Account</th><th class="text-end">Amount</th></tr>
+      </thead>
+      <tbody>
+        {% for row in income_rows %}
+        <tr>
+          <td>{{ row.account.name }}</td>
+          <td class="text-amount text-success">{{ row.amount|floatformat:2 }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+      <tfoot class="table-success fw-bold">
+        <tr><td>Total Income</td><td class="text-amount">{{ total_income|floatformat:2 }}</td></tr>
+      </tfoot>
+
+      <!-- Expenses -->
+      <thead class="table-danger mt-3">
+        <tr><th colspan="2">Expenses</th></tr>
+      </thead>
+      <thead class="table-light">
+        <tr><th>Account</th><th class="text-end">Amount</th></tr>
+      </thead>
+      <tbody>
+        {% for row in expense_rows %}
+        <tr>
+          <td>{{ row.account.name }}</td>
+          <td class="text-amount text-danger">{{ row.amount|floatformat:2 }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+      <tfoot class="table-danger fw-bold">
+        <tr><td>Total Expenses</td><td class="text-amount">{{ total_expenses|floatformat:2 }}</td></tr>
+      </tfoot>
+
+      <!-- Net Income -->
+      <tfoot class="table-dark fw-bold fs-6">
+        <tr>
+          <td>Net {% if net_income >= 0 %}Income{% else %}Loss{% endif %}</td>
+          <td class="text-amount {% if net_income >= 0 %}text-success{% else %}text-danger{% endif %}">
+            {{ net_income|floatformat:2 }}
+          </td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+  <div class="card-footer text-muted small">
+    Period: {% if date_from %}{{ date_from }} to {% endif %}{{ date_to }}
+  </div>
+</div>
+{% else %}
+<div class="card form-card text-center text-muted py-5">
+  <i class="bi bi-graph-up" style="font-size:2.5rem;"></i>
+  <p class="mt-2">No activity for this period.</p>
+</div>
+{% endif %}
